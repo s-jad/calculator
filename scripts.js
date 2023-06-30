@@ -15,31 +15,8 @@ let postNumberSpace = false;
 
 // FUNCTIONS 
 function handleButtons(button) {
-    let currentBtnGroup = 0; // Indiating nothing
     switch (true) {
         case button.classList.contains("number-btn"):
-            currentBtnGroup = 1; // Indiating number button
-            displayButtonInput(button, currentBtnGroup);
-
-            break;
-
-        case button.classList.contains("operation-btn"):
-            currentBtnGroup = 2; // Indiating operation button
-            displayButtonInput(button, currentBtnGroup);
-
-            break;
-
-        case button.classList.contains("control-btn"):
-            currentBtnGroup = 3; // Indiating control button
-            displayButtonInput(button, currentBtnGroup);
-
-            break;
-    }
-}
-
-function displayButtonInput(button, currentBtnGroup) {
-    switch (currentBtnGroup) {
-        case 1:
             let match = button.id.match(/\d+/);
             if (match) {
                 let btnNumber = parseInt(match[0], 10);
@@ -53,16 +30,15 @@ function displayButtonInput(button, currentBtnGroup) {
             }
             break;
 
-        case 2:
+        case button.classList.contains("operation-btn"):
             updateDisplayOperator(button);
 
             if (button.id === "equals-btn") {
                 handleEquals();
             }
-
             break;
 
-        case 3:
+        case button.classList.contains("control-btn"):
             if (button.id === "result-btn") {
                 currentEq.push(prevAns);
                 updateDisplayString("Ans");
@@ -72,11 +48,9 @@ function displayButtonInput(button, currentBtnGroup) {
                 deleteCurrentEq();
             }
             break;
-
-        default:
-            break;
     }
 }
+
 function updateDisplayString(str) {
     screenCurrentEq.innerText = screenCurrentEq.innerText + ` ${str} `;
 }
@@ -235,7 +209,6 @@ function calculate(nodeStr) {
 
 function parseEquation({ variables, operators }) {
     let result = 0;
-    let return_variables = [];
     let stepBackA = 0;
     let stepBackB = 0;
 
