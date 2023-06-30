@@ -204,6 +204,16 @@ select {
     border-radius: 1rem;
 }
 
-.operation-btn {
-    min-height: 3rem;
+.control-btn {
+    font-size: max(20px, 4rem);
+
+}
+/* Media Queries */
+@media (width < 450px) {
+    #operation-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .btn {
+        min-height: 1.5em;
+    }
 }
