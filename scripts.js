@@ -69,7 +69,7 @@ function displayButtonInput(button, currentBtnGroup) {
             } else if (button.id === "menu-btn") {
                 openExtendedOptions();
             } else if (button.id === "cancel-btn") {
-                cancelCurrentEq();
+                deleteCurrentEq();
             }
             break;
 
@@ -77,11 +77,14 @@ function displayButtonInput(button, currentBtnGroup) {
             break;
     }
 }
+function updateDisplayString(str) {
+    screenCurrentEq.innerText = screenCurrentEq.innerText + ` ${str} `;
+}
 
 function updateDisplayOperator(nextOperator) {
     switch (true) {
         case nextOperator.id === "plus-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " +";
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " + ";
             currentEq.push("+");
             postOperatorSpace = true;
             break;
@@ -179,6 +182,14 @@ function updateDisplayOperator(nextOperator) {
 //u }
 
 function handleEquals() {
+    // Example: "6 ="
+    if (currentEq.length <= 2) {
+        prevAns = currentEq[0];
+        displayPrevAns(prevAns);
+        deleteCurrentEq();
+        return;
+    };
+
     console.group();
     let nodesArr = [];
     let startingDepth = 0;
@@ -189,6 +200,10 @@ function handleEquals() {
         console.log(`PRE_REPLACEMENT: nodes[${i}] => ${nodes[i]}`);
         if (nodes[i].includes("?")) {
             console.log("RECOGNIZED ?;");
+            let index = nodes[i].indexOf("?");
+            console.log(`index of ?: ${index}`);
+            let operators = nodes[i].match(/[+\-*/]/g);
+
             nodes[i] = nodes[i].replace("?", total);
             console.log(`POST_REPLACEMENT: nodes[${i}] => ${nodes[i]}`);
         }
@@ -198,21 +213,27 @@ function handleEquals() {
     }
     prevAns = total;
     displayPrevAns(prevAns);
-    cancelCurrentEq();
+    deleteCurrentEq();
     console.groupEnd();
 }
 
 function calculate(nodeStr) {
     let result;
     let { variables, operators } = collectVarOps(nodeStr);
+
+    // Check for single num in brackets: 3*(54) 
+    if (operators === null) {
+        return parseFloat(variables[0]);
+    }
+
     console.log(`CALCULATE: variables, operators => [${variables}], [${operators}]`);
-    result = parseOperators({ variables, operators });
+    result = parseEquation({ variables, operators });
     console.log(`CALCULATE: sum => ${result}`);
 
     return parseFloat(result);
 }
 
-function parseOperators({ variables, operators }) {
+function parseEquation({ variables, operators }) {
     let result = 0;
     let return_variables = [];
     let stepBackA = 0;
@@ -336,7 +357,7 @@ function displayPrevAns(prevAns) {
     screenPrevAns.innerText = prevAns;
 }
 
-function cancelCurrentEq() {
+function deleteCurrentEq() {
     currentEq = [];
     screenCurrentEq.innerText = "";
 }
