@@ -115,48 +115,8 @@ function updateDisplayOperator(nextOperator) {
     }
 }
 
-// class eqNode {
-//     constructor(data) {
-//         this.data = data;
-//         this.x = null;
-//         this.depth = 0;
-//     }
-// }
-
-//u class EqTree {
-//u     constructor() {
-//u         this.root = null
-//u     }
-//u 
-//u     insert(data) {
-//u         const newNode = new Node(data);
-//u 
-//u         if (this.root === null) {
-//u             this.root = newNode;
-//u         } else {
-//u             this.insertNode(this.root, newNode);
-//u         }
-//u     }
-//u 
-//u     insertNode(node, newNode) {
-//u         if (newNode.data < node.data) {
-//u             if (node.left === null) {
-//u                 node.left = newNode;
-//u             } else {
-//u                 this.insertNode(node.left, newNode);
-//u             }
-//u         } else {
-//u             if (node.right === null) {
-//u                 node.right = newNode;
-//u             } else {
-//u                 this.insertNode(node.right, newNode);
-//u             }
-//u         }
-//u     }
-//u }
-
 function handleEquals() {
-    // Example: "6 ="
+    // Handle single number inputs => Example: "6 ="
     if (currentEq.length <= 2) {
         prevAns = currentEq[0];
         displayPrevAns(prevAns);
@@ -171,14 +131,23 @@ function handleEquals() {
 
     let total = 0;
     for (let i = nodes.length - 1; i >= 0; i--) {
-        console.log(`PRE_REPLACEMENT: nodes[${i}] => ${nodes[i]}`);
+
+        // If this is NOT the innermost sub-equation
         if (nodes[i].includes("?")) {
-            console.log("RECOGNIZED ?;");
             let index = nodes[i].indexOf("?");
-            console.log(`index of ?: ${index}`);
-            let operators = nodes[i].match(/[+\-*/]/g);
+            console.log("RECOGNIZED ?;");
+
+            // Handle implied multiplication via () positioning: 
+            // Example => 12(6 - 2) = 48
+            if (!isNaN(nodes[i][index - 1])) {
+                console.log(`index - 1 (NaN?) => ${nodes[i][index - 1]}`)
+                console.log(`index = ${index}`);
+                nodes[i] = nodes[i].substring(0, index) + "*?" + nodes[i].substring(index + "*?".length);
+                nodes[i + 1] = total;
+            }
 
             nodes[i] = nodes[i].replace("?", total);
+
             console.log(`POST_REPLACEMENT: nodes[${i}] => ${nodes[i]}`);
         }
         console.log(`current_depth: ${currentDepth}`);
@@ -292,7 +261,7 @@ function collectVarOps(eqStr) {
 }
 
 function handleBrackets(equation, currentDepth, nodes) {
-    // Limit for recursion
+    // Limit for recursion and stop for equations without brackets
     if (!equation.includes("(") || !equation.includes(")") || equation.length <= 1) {
         nodes[currentDepth] = equation.join("");
         console.log(`finished_nodes: ${nodes}`);
