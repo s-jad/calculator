@@ -187,7 +187,7 @@ function calculate(nodeStr) {
 function handleFactorialExponential({ variables, operators }) {
     let result = 0;
     let stepBackA = 0;
-    console.log("HERE!");;
+
     for (let i = 0; i < operators.length; i++) {
         if (variables.length === 2) {
             console.log("Last operation!!!");
@@ -224,14 +224,10 @@ function handleFactorialExponential({ variables, operators }) {
     }
     return result;
 }
-function parseEquation({ variables, operators }) {
+
+function handleMultiplyDivide({ variables, operators }) {
     let result = 0;
     let stepBackA = 0;
-    let stepBackB = 0;
-
-    result = handleFactorialExponential({ variables, operators });
-    console.log(`Result after handleFactorialExponential => ${result}`);
-
     for (let i = 0; i < operators.length; i++) {
         if (variables.length === 2) {
             console.log("Last operation!!!");
@@ -267,6 +263,12 @@ function parseEquation({ variables, operators }) {
             console.log(`variable array: ${variables}`);
         }
     }
+    return result;
+}
+
+function handleAddSubtract({ variables, operators }) {
+    let result = 0;
+    let stepBackB = 0;
 
     for (let i = 0; i < operators.length; i++) {
         if (variables.length === 2) {
@@ -305,8 +307,20 @@ function parseEquation({ variables, operators }) {
     return result;
 }
 
+function parseEquation({ variables, operators }) {
+    let result = 0;
+
+    result = handleFactorialExponential({ variables, operators });
+    result = handleMultiplyDivide({ variables, operators });
+    result = handleAddSubtract({ variables, operators });
+
+    return result;
+}
+
 function collectVarOps(eqStr) {
+    // Matches 123456890 and . for floats
     let variables = eqStr.match(/\d+(\.\d+)?/g);
+    // Matches +-*/!^ - all current operators
     let operators = eqStr.match(/[+\-*/!^√]/g);
     return { variables, operators };
 }
@@ -315,7 +329,6 @@ function factorial(num) {
     for (let i = num - 1; i > 1; i--) {
         num *= i;
     }
-    console.log(`FACTORIAL: num => ${num}`);
     return num;
 }
 
@@ -333,7 +346,6 @@ function power(num, exp) {
         }
         return num;
     }
-
 }
 
 function handleBrackets(equation, currentDepth, nodes) {
