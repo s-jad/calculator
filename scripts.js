@@ -133,22 +133,29 @@ function handleEquals() {
     for (let i = nodes.length - 1; i >= 0; i--) {
 
         // If this is NOT the innermost sub-equation
+        // Will never be true in the first loop
         if (nodes[i].includes("?")) {
             let index = nodes[i].indexOf("?");
             console.log("RECOGNIZED ?;");
 
             // Handle implied multiplication via () positioning: 
             // Example => 12(6 - 2) = 48
-            if (!isNaN(nodes[i][index - 1])) {
-                console.log(`index - 1 (NaN?) => ${nodes[i][index - 1]}`)
-                console.log(`index = ${index}`);
-                nodes[i] = nodes[i].substring(0, index) + "*?" + nodes[i].substring(index + "*?".length);
-                nodes[i + 1] = total;
+            if (!isNaN(nodes[i][index - 1]) && !isNaN(nodes[i][index + 1])) {
+                console.log("both index + 1 / - 1 are numbers!");
+                nodes[i] = nodes[i].substring(0, index) + "*?*" + nodes[i].substring(index - 2 + "*?*".length);
+                console.log(`nodes[i] => ${nodes[i]}`);
+            } else if (!isNaN(nodes[i][index + 1])) {
+                console.log("only index + 1 is a number!");
+                nodes[i] = nodes[i].substring(0, index) + "?*" + nodes[i].substring(index - 1 + "?*".length);
+                console.log(`nodes[i] => ${nodes[i]}`);
+            } else if (!isNaN(nodes[i][index - 1])) {
+                console.log("only index - 1 is a number!");
+                nodes[i] = nodes[i].substring(0, index) + "*?" + nodes[i].substring(index - 1 + "*?".length);
+                console.log(`nodes[i] => ${nodes[i]}`);
             }
 
+            // Replace ? with total from within bracketed equation
             nodes[i] = nodes[i].replace("?", total);
-
-            console.log(`POST_REPLACEMENT: nodes[${i}] => ${nodes[i]}`);
         }
         console.log(`current_depth: ${currentDepth}`);
         total = calculate(nodes[i]);
@@ -166,6 +173,7 @@ function calculate(nodeStr) {
 
     // Check for single num in brackets: 3*(54) 
     if (operators === null) {
+        console.log("DIDN'T RECOGNIZE AS OPERATOR");
         return parseFloat(variables[0]);
     }
 
@@ -176,10 +184,53 @@ function calculate(nodeStr) {
     return parseFloat(result);
 }
 
+function handleFactorialExponential({ variables, operators }) {
+    let result = 0;
+    let stepBackA = 0;
+    console.log("HERE!");;
+    for (let i = 0; i < operators.length; i++) {
+        if (variables.length === 2) {
+            console.log("Last operation!!!");
+            if (operators[i] == "!") {
+                result = parseFloat(factorial(variables[0]));
+                console.log(`calculating: ${variables[0]}! = ${result}`);
+                break;
+            }
+
+            if (operators[i] == "^") {
+                result = parseFloat(power(variables[0], variables[1]));
+                console.log(`calculating: ${variables[0]}^${variables[1]} = ${result}`);
+                break;
+            }
+        }
+
+        console.log(`Value of i: ${i}`);
+        console.log(`value of stepBackA: ${stepBackA}`);
+        if (operators[i] === "!") {
+            result = parseFloat(factorial(variables[i - stepBackA]));
+            console.log(`calculating: ${variables[i - stepBackA]}! = ${result}`);
+            variables.splice(i - stepBackA, 1, result);
+            stepBackA++;
+            console.log(`variable array: ${variables}`);
+        }
+        if (operators[i] === "^") {
+            result = parseFloat(power(variables[i - stepBackA], variables[i + 1 - stepBackA]));
+            console.log(`calculating: ${variables[i - stepBackA]}^${variables[i + 1 - stepBackA]} = ${result}`);
+            variables.splice(i - stepBackA, 1, result);
+            variables.splice(i + 1 - stepBackA, 1);
+            stepBackA++;
+            console.log(`variable array: ${variables}`);
+        }
+    }
+    return result;
+}
 function parseEquation({ variables, operators }) {
     let result = 0;
     let stepBackA = 0;
     let stepBackB = 0;
+
+    result = handleFactorialExponential({ variables, operators });
+    console.log(`Result after handleFactorialExponential => ${result}`);
 
     for (let i = 0; i < operators.length; i++) {
         if (variables.length === 2) {
@@ -256,8 +307,33 @@ function parseEquation({ variables, operators }) {
 
 function collectVarOps(eqStr) {
     let variables = eqStr.match(/\d+(\.\d+)?/g);
-    let operators = eqStr.match(/[+\-*/]/g);
+    let operators = eqStr.match(/[+\-*/!^√]/g);
     return { variables, operators };
+}
+
+function factorial(num) {
+    for (let i = num - 1; i > 1; i--) {
+        num *= i;
+    }
+    console.log(`FACTORIAL: num => ${num}`);
+    return num;
+}
+
+function power(num, exp) {
+    if (exp === "0") {
+        return 1;
+    }
+
+    if (exp === "1") {
+        return num;
+    } else {
+        let originalNum = num
+        for (let i = 0; i < exp; i++) {
+            num *= originalNum;
+        }
+        return num;
+    }
+
 }
 
 function handleBrackets(equation, currentDepth, nodes) {
@@ -270,7 +346,7 @@ function handleBrackets(equation, currentDepth, nodes) {
 
     let innerEquation = equation;
     let lastLBracket = 0;
-    let lastRBracket = equation.length - 1;
+    let lastRBracket = equation.length;
 
     for (let i = 0; i < lastRBracket; i++) {
         if (equation[i] === "(") {
