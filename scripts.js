@@ -1,7 +1,8 @@
 // HTML ELEMENTS
 const root = document.documentElement;
 const buttons = document.getElementsByClassName('btn');
-
+const buttonGrid = document.getElementById('button-grid');
+const operatorButtonGrid = document.getElementById('operation-grid');
 const screenCurrentEq = document.getElementById('current-equation');
 const screenPrevAns = document.getElementById('answer');
 
@@ -108,7 +109,7 @@ function updateDisplayOperator(nextOperator) {
 
         case nextOperator.id === "sqrt-btn":
             currentEq.push("√");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + "√";
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " √";
             break;
 
         case nextOperator.id === "l-bracket-btn":
@@ -434,13 +435,87 @@ function deleteCurrentEq() {
     screenCurrentEq.innerText = "";
 }
 
+
+const logBtn = document.createElement("button");
+logBtn.classList.add("btn");
+logBtn.classList.add("operation-btn");
+logBtn.innerText = "log";
+
+const lnBtn = document.createElement("button");
+lnBtn.classList.add("btn");
+lnBtn.classList.add("operation-btn");
+lnBtn.innerText = "ln";
+
+const sinBtn = document.createElement("button");
+sinBtn.classList.add("btn");
+sinBtn.classList.add("operation-btn");
+sinBtn.innerText = "sin";
+
+const cosBtn = document.createElement("button");
+cosBtn.classList.add("btn");
+cosBtn.classList.add("operation-btn");
+cosBtn.innerText = "cos";
+
+const tanBtn = document.createElement("button");
+tanBtn.classList.add("btn");
+tanBtn.classList.add("operation-btn");
+tanBtn.innerText = "tan";
+
+const piBtn = document.createElement("button");
+piBtn.classList.add("btn");
+piBtn.classList.add("operation-btn");
+piBtn.innerText = "π";
+
+const eBtn = document.createElement("button");
+eBtn.classList.add("btn");
+eBtn.classList.add("operation-btn");
+eBtn.innerText = "e";
+
+const modBtn = document.createElement("button");
+modBtn.classList.add("btn");
+modBtn.classList.add("operation-btn");
+modBtn.innerText = "mod";
+
+const invBtn = document.createElement("button");
+invBtn.classList.add("btn");
+invBtn.classList.add("operation-btn");
+invBtn.innerText = "Inv";
+
+const radDegBtn = document.createElement("button");
+radDegBtn.classList.add("btn");
+radDegBtn.classList.add("operation-btn");
+radDegBtn.innerText = "Rad";
+
 function toggleExtendedOptions() {
-    if (extendedOptionsOpen) {
-        console.log(`Extended Options currently open: ${extendedOptionsOpen} `);
-        extendedOptionsOpen = false;
-    } else {
-        console.log(`Extended Options currently open: ${extendedOptionsOpen} `);
+    if (!extendedOptionsOpen) {
+        buttonGrid.classList.toggle('expanded');
+        operatorButtonGrid.classList.toggle('extended');
         extendedOptionsOpen = true;
+        operatorButtonGrid.appendChild(logBtn);
+        operatorButtonGrid.appendChild(lnBtn);
+        operatorButtonGrid.appendChild(sinBtn);
+        operatorButtonGrid.appendChild(cosBtn);
+        operatorButtonGrid.appendChild(tanBtn);
+        operatorButtonGrid.appendChild(piBtn);
+        operatorButtonGrid.appendChild(eBtn);
+        operatorButtonGrid.appendChild(invBtn);
+        operatorButtonGrid.appendChild(modBtn);
+        operatorButtonGrid.appendChild(radDegBtn);
+    } else if (extendedOptionsOpen) {
+        operatorButtonGrid.removeChild(logBtn);
+        operatorButtonGrid.removeChild(lnBtn);
+        operatorButtonGrid.removeChild(sinBtn);
+        operatorButtonGrid.removeChild(cosBtn);
+        operatorButtonGrid.removeChild(tanBtn);
+        operatorButtonGrid.removeChild(piBtn);
+        operatorButtonGrid.removeChild(eBtn);
+        operatorButtonGrid.removeChild(invBtn);
+        operatorButtonGrid.removeChild(modBtn);
+        operatorButtonGrid.removeChild(radDegBtn);
+
+        buttonGrid.classList.toggle('expanded');
+        operatorButtonGrid.classList.toggle('extended');
+        extendedOptionsOpen = false;
     }
 }
 

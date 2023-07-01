@@ -166,12 +166,23 @@ select {
 #button-grid {
     min-width: 70vw;
     min-height: 70vh;
+    max-height: 70vw;
     grid-template-areas: "nBtn nBtn nBtn oBtn"
                          "nBtn nBtn nBtn oBtn"
                          "nBtn nBtn nBtn oBtn"
                          "cBtn cBtn cBtn oBtn";
 
     background: hsl(130, 40%, 20%);
+    transition: grid-template-areas 300ms ease-in-out,
+                min-width 300ms ease-in-out;
+}
+
+#button-grid.expanded {
+    min-width: 80vw;
+    grid-template-areas: "nBtn nBtn nBtn oBtn oBtn"
+                         "nBtn nBtn nBtn oBtn oBtn"
+                         "nBtn nBtn nBtn oBtn oBtn"
+                         "cBtn cBtn cBtn oBtn oBtn";
 }
 
 #number-grid {
@@ -182,6 +193,11 @@ select {
 #operation-grid {
     grid-area: oBtn;
     grid-template-columns: repeat(2, 1fr);
+    transition: grid-template-columns 300ms ease-in-out;
+}
+
+#operation-grid.extended {
+    grid-template-columns: repeat(4, 1fr);
 }
 
 #control-flex {
