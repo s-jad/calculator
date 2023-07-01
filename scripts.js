@@ -184,19 +184,17 @@ function calculate(nodeStr) {
         return parseFloat(variables[0]);
     }
 
-    console.log(`CALCULATE: variables, operators => [${variables}], [${operators}]`);
     result = parseEquation({ variables, operators });
-    console.log(`CALCULATE: sum => ${result}`);
 
     return parseFloat(result);
 }
 
-function handleFactorialExponential({ variables, operators }) {
+function handleFactorialExponentialSqrt({ variables, operators }) {
     let result = 0;
     let stepBackA = 0;
 
     for (let i = 0; i < operators.length; i++) {
-        if (variables.length === 2) {
+        if (variables.length <= 2) {
             console.log("Last operation!!!");
             if (operators[i] == "!") {
                 result = parseFloat(factorial(variables[0]));
@@ -209,11 +207,24 @@ function handleFactorialExponential({ variables, operators }) {
                 console.log(`calculating: ${variables[0]}^${variables[1]} = ${result}`);
                 break;
             }
+
+            if (operators[i] == "√") {
+                result = parseFloat(Math.sqrt(variables[0]));
+                console.log(`calculating: √${variables[0]} = ${result}`);
+                break;
+            }
         }
 
         if (operators[i] === "!") {
             result = parseFloat(factorial(variables[i - stepBackA]));
             console.log(`calculating: ${variables[i - stepBackA]}! = ${result}`);
+            variables.splice(i - stepBackA, 1, result);
+            stepBackA++;
+            console.log(`variable array: ${variables}`);
+        }
+        if (operators[i] === "√") {
+            result = parseFloat(Math.sqrt(variables[i - stepBackA]));
+            console.log(`calculating: √${variables[i - stepBackA]} = ${result}`);
             variables.splice(i - stepBackA, 1, result);
             stepBackA++;
             console.log(`variable array: ${variables}`);
@@ -229,7 +240,7 @@ function handleFactorialExponential({ variables, operators }) {
     }
     // Clear the used operators
     operators = operators.filter(function(operator) {
-        return operator !== "^" && operator !== "!";
+        return operator !== "^" && operator !== "!" && operator !== "√";
     });
 
     return { result, operators };
@@ -327,9 +338,9 @@ function handleAddSubtract(variables, operators) {
 function parseEquation({ variables, operators }) {
     let data = { result: 0, operators: operators };
 
-    if (operators.includes("!") || operators.includes("^")) {
+    if (operators.includes("!") || operators.includes("^") || operators.includes("√")) {
         console.log(`PARSE_EQ preFE: variables, operators => [${variables}], [${operators}]`);
-        data = handleFactorialExponential({ variables, operators });
+        data = handleFactorialExponentialSqrt({ variables, operators });
         console.log(`PARSE_EQ postFE: variables, operators => [${variables}], [${data.operators}]`);
         console.log(`FE PARSE_EQ: result => ${data.result}`);
     }
