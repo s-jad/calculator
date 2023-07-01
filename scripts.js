@@ -10,6 +10,7 @@ const screenPrevAns = document.getElementById('answer');
 let currentEq = [];
 let prevAns = 0;
 let extendedOptionsOpen = false;
+let infoModalOpen = false;
 let postOperatorSpace = false;
 let postNumberSpace = false;
 
@@ -28,6 +29,14 @@ function handleButtons(button) {
                     screenCurrentEq.innerText += match[0];
                 }
             }
+            if (button.id === "dot-btn") {
+                currentEq.push(".");
+                updateDisplayString(".");
+            }
+            if (button.id === "result-btn") {
+                currentEq.push(prevAns);
+                updateDisplayString(" Ans ");
+            }
             break;
 
         case button.classList.contains("operation-btn"):
@@ -39,11 +48,10 @@ function handleButtons(button) {
             break;
 
         case button.classList.contains("control-btn"):
-            if (button.id === "result-btn") {
-                currentEq.push(prevAns);
-                updateDisplayString("Ans");
+            if (button.id === "info-btn") {
+                openInfoModal();
             } else if (button.id === "menu-btn") {
-                openExtendedOptions();
+                toggleExtendedOptions();
             } else if (button.id === "cancel-btn") {
                 deleteCurrentEq();
             }
@@ -52,7 +60,7 @@ function handleButtons(button) {
 }
 
 function updateDisplayString(str) {
-    screenCurrentEq.innerText = screenCurrentEq.innerText + ` ${str} `;
+    screenCurrentEq.innerText = screenCurrentEq.innerText + `${str}`;
 }
 
 function updateDisplayOperator(nextOperator) {
@@ -129,7 +137,7 @@ function handleEquals() {
     let startingDepth = 0;
     let { currentDepth, nodes } = handleBrackets(currentEq, startingDepth, nodesArr);
 
-    let total = 0;
+    let total = 0.0;
     for (let i = nodes.length - 1; i >= 0; i--) {
 
         // If this is NOT the innermost sub-equation
@@ -173,7 +181,6 @@ function calculate(nodeStr) {
 
     // Check for single num in brackets: 3*(54) 
     if (operators === null) {
-        console.log("DIDN'T RECOGNIZE AS OPERATOR");
         return parseFloat(variables[0]);
     }
 
@@ -204,8 +211,6 @@ function handleFactorialExponential({ variables, operators }) {
             }
         }
 
-        console.log(`Value of i: ${i}`);
-        console.log(`value of stepBackA: ${stepBackA}`);
         if (operators[i] === "!") {
             result = parseFloat(factorial(variables[i - stepBackA]));
             console.log(`calculating: ${variables[i - stepBackA]}! = ${result}`);
@@ -222,10 +227,15 @@ function handleFactorialExponential({ variables, operators }) {
             console.log(`variable array: ${variables}`);
         }
     }
-    return result;
+    // Clear the used operators
+    operators = operators.filter(function(operator) {
+        return operator !== "^" && operator !== "!";
+    });
+
+    return { result, operators };
 }
 
-function handleMultiplyDivide({ variables, operators }) {
+function handleMultiplyDivide(variables, operators) {
     let result = 0;
     let stepBackA = 0;
     for (let i = 0; i < operators.length; i++) {
@@ -244,8 +254,6 @@ function handleMultiplyDivide({ variables, operators }) {
             }
         }
 
-        console.log(`Value of i: ${i}`);
-        console.log(`value of stepBackA: ${stepBackA}`);
         if (operators[i] === "*") {
             result = parseFloat(variables[i - stepBackA]) * parseFloat(variables[i + 1 - stepBackA]);
             console.log(`calculating: ${variables[i - stepBackA]} * ${variables[i + 1 - stepBackA]} = ${result}`);
@@ -263,10 +271,15 @@ function handleMultiplyDivide({ variables, operators }) {
             console.log(`variable array: ${variables}`);
         }
     }
-    return result;
+    // Clear the used operators
+    operators = operators.filter(function(operator) {
+        return operator !== "/" && operator !== "*";
+    });
+
+    return { result, operators };
 }
 
-function handleAddSubtract({ variables, operators }) {
+function handleAddSubtract(variables, operators) {
     let result = 0;
     let stepBackB = 0;
 
@@ -285,8 +298,7 @@ function handleAddSubtract({ variables, operators }) {
                 break;
             }
         }
-        console.log(`Value of i: ${i}`);
-        console.log(`value of stepBackB: ${stepBackB}`);
+
         if (operators[i] === "+") {
             result = parseFloat(variables[i - stepBackB]) + parseFloat(variables[i + 1 - stepBackB]);
             console.log(`calculating: ${variables[i - stepBackB]} + ${variables[i + 1 - stepBackB]} = ${result}`);
@@ -304,17 +316,36 @@ function handleAddSubtract({ variables, operators }) {
             console.log(`variable array: ${variables}`);
         }
     }
-    return result;
+    // Clear the used operators
+    operators = operators.filter(function(operator) {
+        return operator !== "-" && operator !== "+";
+    });
+
+    return { result, operators };
 }
 
 function parseEquation({ variables, operators }) {
-    let result = 0;
+    let data = { result: 0, operators: operators };
 
-    result = handleFactorialExponential({ variables, operators });
-    result = handleMultiplyDivide({ variables, operators });
-    result = handleAddSubtract({ variables, operators });
-
-    return result;
+    if (operators.includes("!") || operators.includes("^")) {
+        console.log(`PARSE_EQ preFE: variables, operators => [${variables}], [${operators}]`);
+        data = handleFactorialExponential({ variables, operators });
+        console.log(`PARSE_EQ postFE: variables, operators => [${variables}], [${data.operators}]`);
+        console.log(`FE PARSE_EQ: result => ${data.result}`);
+    }
+    if (operators.includes("*") || operators.includes("/")) {
+        console.log(`PARSE_EQ preMD: variables, operators => [${variables}], [${data.operators}]`);
+        data = handleMultiplyDivide(variables, data.operators);
+        console.log(`PARSE_EQ postMD: variables, operators => [${variables}], [${data.operators}]`);
+        console.log(`MD PARSE_EQ: result => ${data.result}`);
+    }
+    if (operators.includes("+") || operators.includes("-")) {
+        console.log(`PARSE_EQ preAS: variables, operators => [${variables}], [${data.operators}]`);
+        data = handleAddSubtract(variables, data.operators);
+        console.log(`PARSE_EQ postAS: variables, operators => [${variables}], [${data.operators}]`);
+        console.log(`AS PARSE_EQ: result => ${data.result}`);
+    }
+    return data.result;
 }
 
 function collectVarOps(eqStr) {
@@ -392,8 +423,24 @@ function deleteCurrentEq() {
     screenCurrentEq.innerText = "";
 }
 
-function openExtendedOptions() {
-    console.log(`Extended Options currently open: ${extendedOptionsOpen} `);
+function toggleExtendedOptions() {
+    if (extendedOptionsOpen) {
+        console.log(`Extended Options currently open: ${extendedOptionsOpen} `);
+        extendedOptionsOpen = false;
+    } else {
+        console.log(`Extended Options currently open: ${extendedOptionsOpen} `);
+        extendedOptionsOpen = true;
+    }
+}
+
+function openInfoModal() {
+    if (infoModalOpen) {
+        console.log(`Info modal currently open: ${infoModalOpen} `);
+        infoModalOpen = false;
+    } else {
+        console.log(`Info modal currently open: ${infoModalOpen} `);
+        infoModalOpen = true;
+    }
 }
 
 
