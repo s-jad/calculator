@@ -1,11 +1,83 @@
 // HTML ELEMENTS
 const root = document.documentElement;
-const buttons = document.getElementsByClassName('btn');
 const buttonGrid = document.getElementById('button-grid');
 const operatorButtonGrid = document.getElementById('operation-grid');
 const screenCurrentEq = document.getElementById('current-equation');
 const screenPrevAns = document.getElementById('answer');
 
+// Extended buttons
+
+const logBtn = document.createElement("button");
+logBtn.setAttribute('id', 'log-btn');
+logBtn.classList.add("btn");
+logBtn.classList.add("extended-btn");
+logBtn.classList.add("operation-btn");
+logBtn.innerText = "log";
+
+const lnBtn = document.createElement("button");
+lnBtn.setAttribute('id', 'ln-btn');
+lnBtn.classList.add("btn");
+lnBtn.classList.add("extended-btn");
+lnBtn.classList.add("operation-btn");
+lnBtn.innerText = "ln";
+
+const sinBtn = document.createElement("button");
+sinBtn.setAttribute('id', 'sin-btn');
+sinBtn.classList.add("btn");
+sinBtn.classList.add("extended-btn");
+sinBtn.classList.add("operation-btn");
+sinBtn.innerText = "sin";
+
+const cosBtn = document.createElement("button");
+cosBtn.setAttribute('id', 'cos-btn');
+cosBtn.classList.add("btn");
+cosBtn.classList.add("extended-btn");
+cosBtn.classList.add("operation-btn");
+cosBtn.innerText = "cos";
+
+const tanBtn = document.createElement("button");
+tanBtn.setAttribute('id', 'tan-btn');
+tanBtn.classList.add("btn");
+tanBtn.classList.add("extended-btn");
+tanBtn.classList.add("operation-btn");
+tanBtn.innerText = "tan";
+
+const piBtn = document.createElement("button");
+piBtn.setAttribute('id', 'pi-btn');
+piBtn.classList.add("btn");
+piBtn.classList.add("extended-btn");
+piBtn.classList.add("operation-btn");
+piBtn.innerText = "π";
+
+const eBtn = document.createElement("button");
+eBtn.setAttribute('id', 'e-btn');
+eBtn.classList.add("btn");
+eBtn.classList.add("extended-btn");
+eBtn.classList.add("operation-btn");
+eBtn.innerText = "e";
+
+const modBtn = document.createElement("button");
+modBtn.setAttribute('id', 'mod-btn');
+modBtn.classList.add("btn");
+modBtn.classList.add("extended-btn");
+modBtn.classList.add("operation-btn");
+modBtn.innerText = "mod";
+
+const invBtn = document.createElement("button");
+invBtn.setAttribute('id', 'inv-btn');
+invBtn.classList.add("btn");
+invBtn.classList.add("extended-btn");
+invBtn.classList.add("operation-btn");
+invBtn.innerText = "Inv";
+
+const radDegBtn = document.createElement("button");
+radDegBtn.setAttribute('id', 'rad-deg-btn');
+radDegBtn.classList.add("btn");
+radDegBtn.classList.add("extended-btn");
+radDegBtn.classList.add("operation-btn");
+radDegBtn.innerText = "Rad";
+
+const buttons = document.getElementsByClassName('btn');
 
 // GLOBAL VARIABLES
 let currentEq = [];
@@ -14,6 +86,7 @@ let extendedOptionsOpen = false;
 let infoModalOpen = false;
 let postOperatorSpace = false;
 let postNumberSpace = false;
+let isRad = true;
 
 // FUNCTIONS 
 function handleButtons(button) {
@@ -121,6 +194,63 @@ function updateDisplayOperator(nextOperator) {
             currentEq.push(")");
             screenCurrentEq.innerText = screenCurrentEq.innerText + " ) ";
             break;
+
+        case nextOperator.id === "log-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " log";
+            currentEq.push("log");
+            break;
+
+        case nextOperator.id === "ln-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " ln";
+            currentEq.push("ln");
+            break;
+
+        case nextOperator.id === "sin-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " sin";
+            currentEq.push("*");
+            break;
+
+        case nextOperator.id === "cos-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " cos";
+            currentEq.push("/");
+            postOperatorSpace = true;
+            break;
+
+        case nextOperator.id === "tan-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " tan";
+            currentEq.push("tan");
+            postOperatorSpace = true;
+            break;
+
+        case nextOperator.id === "pi-btn":
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " π ";
+            currentEq.push("π");
+            break;
+
+        case nextOperator.id === "e-btn":
+            currentEq.push("e");
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " e ";
+            break;
+
+        case nextOperator.id === "mod-btn":
+            currentEq.push("%");
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " % ";
+            break;
+
+        case nextOperator.id === "inv-btn":
+            currentEq.push("Inv");
+            screenCurrentEq.innerText = screenCurrentEq.innerText + " Inv ";
+            break;
+
+        case nextOperator.id === "rad-deg-btn":
+            if (isRad) {
+                isRad = false;
+                nextOperator.innerText = "Deg";
+            } else {
+                isRad = true;
+                nextOperator.innerText = "Rad";
+            }
+            break;
     }
 }
 
@@ -136,7 +266,7 @@ function handleEquals() {
     console.group();
     let nodesArr = [];
     let startingDepth = 0;
-    let { currentDepth, nodes } = handleBrackets(currentEq, startingDepth, nodesArr);
+    let { currentDepth, nodes } = experimentalHandleBrackets(currentEq, startingDepth, nodesArr);
 
     let total = 0.0;
     for (let i = nodes.length - 1; i >= 0; i--) {
@@ -365,6 +495,7 @@ function collectVarOps(eqStr) {
     let variables = eqStr.match(/\d+(\.\d+)?/g);
     // Matches +-*/!^ - all current operators
     let operators = eqStr.match(/[+\-*/!^√]/g);
+
     return { variables, operators };
 }
 
@@ -390,6 +521,83 @@ function power(num, exp) {
         return num;
     }
 }
+
+function experimentalHandleBrackets(equation, currentDepth, nodes) {
+    // Limit for recursion and stop for equations without brackets
+    if (!equation.includes("(") || !equation.includes(")") || equation.length <= 1) {
+        nodes[currentDepth] = equation.join("");
+        console.log(`finished_nodes: ${nodes}`);
+        return { currentDepth, nodes };
+    }
+
+    let innerEquation = equation;
+
+    let lastLBracket = 0;
+    let lastRBracket = equation.length;
+
+    let lBracketCount = 0;
+    let rBracketCount = 0;
+
+    let bracketGroups = 0;
+
+    let currentBracketGroupStart = 0;
+    let currentBracketGroupEnd = 0;
+
+    let bracketZones = [];
+
+
+    for (let i = 0, exp = 0; i < lastRBracket, exp < lastRBracket; i++, exp++) {
+        if (equation[exp] === "(") {
+            currentBracketGroupStart = exp;
+            lBracketCount++;
+            for (let k = exp; k < lastRBracket; k++) {
+                if (equation[k] === "(") {
+                    lBracketCount++;
+                    console.log(`lBracketCount => ${lBracketCount}`);
+                    break;
+                }
+                if (equation[k] === ")") {
+                    console.log(`rBracketCount => ${rBracketCount}`);
+                    rBracketCount++;
+                }
+
+                // If final matching ) of the group is found
+                if (lBracketCount === rBracketCount) {
+                    currentBracketGroupEnd = k;
+                    exp = k;
+                    bracketGroups++;
+                    bracketZones.push(currentBracketGroupStart);
+                    bracketZones.push(currentBracketGroupEnd);
+                    lBracketCount = 0;
+                    rBracketCount = 0;
+                    break;
+                }
+            }
+            console.log(`currentBracketGroupStart => ${currentBracketGroupStart}`);
+            console.log(`currentBracketGroupEnd => ${currentBracketGroupEnd}`);
+            console.log(`bracketZones => ${bracketZones}`);
+            console.log(`bracketGroups => ${bracketGroups}`);
+        }
+        for (let j = lastRBracket; j > i; j--) {
+            if (equation[j] === ")" && equation[i] === "(") {
+                const beforeBrackets = innerEquation.slice(lastLBracket, i);
+                const afterBrackets = innerEquation.slice(j + 1, lastRBracket);
+                innerEquation = innerEquation.slice(i + 1, j);
+
+                const outerStr = beforeBrackets.join("") + "?" + afterBrackets.join("");
+                nodes[currentDepth] = outerStr;
+
+                console.log(`before brackets ${currentDepth}: ${beforeBrackets} `);
+                console.log(`after brackets ${currentDepth}: ${afterBrackets} `);
+                console.log(`inner equation ${currentDepth}: ${innerEquation} `);
+                console.log(`node ${currentDepth} = ${nodes[currentDepth]} `);
+                currentDepth++;
+                return experimentalHandleBrackets(innerEquation, currentDepth, nodes);
+            }
+        }
+    }
+}
+
 
 function handleBrackets(equation, currentDepth, nodes) {
     // Limit for recursion and stop for equations without brackets
@@ -435,62 +643,14 @@ function deleteCurrentEq() {
     screenCurrentEq.innerText = "";
 }
 
-
-const logBtn = document.createElement("button");
-logBtn.classList.add("btn");
-logBtn.classList.add("operation-btn");
-logBtn.innerText = "log";
-
-const lnBtn = document.createElement("button");
-lnBtn.classList.add("btn");
-lnBtn.classList.add("operation-btn");
-lnBtn.innerText = "ln";
-
-const sinBtn = document.createElement("button");
-sinBtn.classList.add("btn");
-sinBtn.classList.add("operation-btn");
-sinBtn.innerText = "sin";
-
-const cosBtn = document.createElement("button");
-cosBtn.classList.add("btn");
-cosBtn.classList.add("operation-btn");
-cosBtn.innerText = "cos";
-
-const tanBtn = document.createElement("button");
-tanBtn.classList.add("btn");
-tanBtn.classList.add("operation-btn");
-tanBtn.innerText = "tan";
-
-const piBtn = document.createElement("button");
-piBtn.classList.add("btn");
-piBtn.classList.add("operation-btn");
-piBtn.innerText = "π";
-
-const eBtn = document.createElement("button");
-eBtn.classList.add("btn");
-eBtn.classList.add("operation-btn");
-eBtn.innerText = "e";
-
-const modBtn = document.createElement("button");
-modBtn.classList.add("btn");
-modBtn.classList.add("operation-btn");
-modBtn.innerText = "mod";
-
-const invBtn = document.createElement("button");
-invBtn.classList.add("btn");
-invBtn.classList.add("operation-btn");
-invBtn.innerText = "Inv";
-
-const radDegBtn = document.createElement("button");
-radDegBtn.classList.add("btn");
-radDegBtn.classList.add("operation-btn");
-radDegBtn.innerText = "Rad";
+let isFirstToggle = true;
 
 function toggleExtendedOptions() {
     if (!extendedOptionsOpen) {
         buttonGrid.classList.toggle('expanded');
         operatorButtonGrid.classList.toggle('extended');
         extendedOptionsOpen = true;
+
         operatorButtonGrid.appendChild(logBtn);
         operatorButtonGrid.appendChild(lnBtn);
         operatorButtonGrid.appendChild(sinBtn);
@@ -501,6 +661,18 @@ function toggleExtendedOptions() {
         operatorButtonGrid.appendChild(invBtn);
         operatorButtonGrid.appendChild(modBtn);
         operatorButtonGrid.appendChild(radDegBtn);
+
+        if (isFirstToggle) {
+            const extendedButtons = document.getElementsByClassName("extended-btn");
+
+            Array.from(extendedButtons).forEach((button) => {
+                button.addEventListener("click", () => handleButtons(button));
+            });
+
+            isFirstToggle = false;
+        }
+
+
     } else if (extendedOptionsOpen) {
         operatorButtonGrid.removeChild(logBtn);
         operatorButtonGrid.removeChild(lnBtn);
@@ -519,6 +691,7 @@ function toggleExtendedOptions() {
     }
 }
 
+
 function openInfoModal() {
     if (infoModalOpen) {
         console.log(`Info modal currently open: ${infoModalOpen} `);
@@ -529,7 +702,6 @@ function openInfoModal() {
     }
 }
 
-
 // EVENT LISTENERS
 
 // -- MOUSE EVENT LISTENERS
@@ -538,8 +710,8 @@ Array.from(buttons).forEach((button) => {
 });
 
 
+
 // -- KEYBOARD EVENT LISTENERS
 
 // UTILITY FUNCTIONS
-
 
