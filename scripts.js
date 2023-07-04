@@ -159,92 +159,55 @@ function updateDisplayString(str) {
 function updateDisplayOperator(nextOperator) {
     switch (true) {
         case nextOperator.id === "plus-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " + ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " + ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " + ";
             currentEq.push("+");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "minus-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " - ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " - ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " - ";
             currentEq.push("-");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "multiply-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " * ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " * ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " * ";
             currentEq.push("*");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "divide-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " / ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " / ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " / ";
             currentEq.push("/");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "equals-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " = ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " = ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " = ";
             currentEq.push("=");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "factorial-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "! ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "! ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + "! ";
             currentEq.push("!");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "power-btn":
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + "^";
             currentEq.push("^");
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ^ ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "^";
-            }
             break;
 
         case nextOperator.id === "sqrt-btn":
             currentEq.push("√");
             currentEq.push("(");
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
-            }
             currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
             break;
 
         case nextOperator.id === "l-bracket-btn":
             currentEq.push("(");
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ( ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ( ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ( ";
             break;
 
         case nextOperator.id === "r-bracket-btn":
@@ -262,61 +225,37 @@ function updateDisplayOperator(nextOperator) {
             break;
 
         case nextOperator.id === "log-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " log(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " log(";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " log(";
             currentEq.push("log");
             currentEq.push("(");
             break;
 
         case nextOperator.id === "ln-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ln(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ln(";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ln(";
             currentEq.push("ln");
             currentEq.push("(");
             break;
 
         case nextOperator.id === "sin-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " sin(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " sin(";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " sin(";
             currentEq.push("sin");
             currentEq.push("(");
             break;
 
         case nextOperator.id === "cos-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " cos(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " cos(";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " cos(";
             currentEq.push("cos");
             currentEq.push("(");
             break;
 
         case nextOperator.id === "tan-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " tan(";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " tan(";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " tan(";
             currentEq.push("tan");
             currentEq.push("(");
             break;
 
         case nextOperator.id === "pi-btn":
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " π ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " π ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " π ";
             currentEq.push("π");
             postOperatorSpace = true;
             break;
@@ -333,20 +272,12 @@ function updateDisplayOperator(nextOperator) {
 
         case nextOperator.id === "mod-btn":
             currentEq.push("%");
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " % ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " % ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " % ";
             break;
 
         case nextOperator.id === "inv-btn":
             currentEq.push("Inv");
-            if (superscript) {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " Inv ";
-            } else {
-                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " Inv ";
-            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " Inv ";
             break;
 
         case nextOperator.id === "rad-deg-btn":
