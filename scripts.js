@@ -381,25 +381,8 @@ function handleEquals() {
         // If this is NOT the innermost sub-equation
         // Will never be true in the first loop
         if (nodes[i].includes("?")) {
-            let index = nodes[i].indexOf("?");
-            console.log("RECOGNIZED ?;");
 
-            // Handle implied multiplication via () positioning: 
-            // Example => 12(6 - 2) = 48
-            if (!isNaN(nodes[i][index - 1]) && !isNaN(nodes[i][index + 1])) {
-                console.log("both index + 1 / - 1 are numbers!");
-                nodes[i] = nodes[i].substring(0, index) + "*?*" + nodes[i].substring(index - 2 + "*?*".length);
-                console.log(`nodes[i] => ${nodes[i]}`);
-            } else if (!isNaN(nodes[i][index + 1])) {
-                console.log("only index + 1 is a number!");
-                nodes[i] = nodes[i].substring(0, index) + "?*" + nodes[i].substring(index - 1 + "?*".length);
-                console.log(`nodes[i] => ${nodes[i]}`);
-            } else if (!isNaN(nodes[i][index - 1])) {
-                console.log("only index - 1 is a number!");
-                nodes[i] = nodes[i].substring(0, index) + "*?" + nodes[i].substring(index - 1 + "*?".length);
-                console.log(`nodes[i] => ${nodes[i]}`);
-            }
-
+            nodes = handlePrePostBrackets(i, nodes);
             // Replace ? with total from within bracketed equation
             nodes[i] = nodes[i].replace("?", total);
         }
@@ -411,6 +394,29 @@ function handleEquals() {
     displayPrevAns(prevAns);
     deleteCurrentEq();
     console.groupEnd();
+}
+
+function handlePrePostBrackets(nodeIndex, nodes) {
+    let index = nodes[nodeIndex].indexOf("?");
+    console.log("RECOGNIZED ?;");
+
+    // Handle implied multiplication via () positioning: 
+    // Example => 12(6 - 2) = 48
+    if (!isNaN(nodes[nodeIndex][index - 1]) && !isNaN(nodes[nodeIndex][index + 1])) {
+        console.log("both index + 1 / - 1 are numbers!");
+        nodes[nodeIndex] = nodes[nodeIndex].substring(0, index) + "*?*" + nodes[nodeIndex].substring(index - 2 + "*?*".length);
+        console.log(`nodes[i] => ${nodes[i]}`);
+    } else if (!isNaN(nodes[nodeIndex][index + 1])) {
+        console.log("only index + 1 is a number!");
+        nodes[nodeIndex] = nodes[nodeIndex].substring(0, index) + "?*" + nodes[nodeIndex].substring(index - 1 + "?*".length);
+        console.log(`nodes[i] => ${nodes[nodeIndex]}`);
+    } else if (!isNaN(nodes[nodeIndex][index - 1])) {
+        console.log("only index - 1 is a number!");
+        nodes[nodeIndex] = nodes[nodeIndex].substring(0, index) + "*?" + nodes[nodeIndex].substring(index - 1 + "*?".length);
+        console.log(`nodes[i] => ${nodes[nodeIndex]}`);
+    }
+
+    return nodes;
 }
 
 function calculate(nodeStr) {
@@ -630,7 +636,7 @@ function power(num, exp) {
 }
 
 function experimentalHandleBrackets(equation, currentDepth, nodes) {
-    // Limit for recursion and stop for equations without brackets
+    // Limit for recursion and break for equations without brackets
     if (!equation.includes("(") || !equation.includes(")") || equation.length <= 1) {
         nodes[currentDepth] = equation.join("");
         console.log(`finished_nodes: ${nodes}`);
@@ -777,6 +783,7 @@ function toggleExtendedOptions() {
         operatorButtonGrid.appendChild(modBtn);
         operatorButtonGrid.appendChild(radDegBtn);
 
+        // Add "click" event to new operator buttons
         if (isFirstToggle) {
             const extendedButtons = document.getElementsByClassName("extended-btn");
 
