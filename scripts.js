@@ -746,13 +746,16 @@ function displayPrevAns(prevAns) {
 }
 
 function deleteCurrentEq() {
+    // Delete equation from calculation array.
     currentEq = [];
-    // Remove all of the spans and sups
-    while (screenCurrentEq.firstChild) {
-        screenCurrentEq.remove(screenCurrentEq.firstChild);
-    }
 
-    currentScreenTextNode.innerText = "";
+    // Remove all of the spans and sups
+    screenCurrentEq.replaceChildren();
+
+    // Assign currentScreenTextNode to new empty span for next equation
+    const newScreenNode = document.createElement("span");
+    currentScreenTextNode = newScreenNode;
+    screenCurrentEq.appendChild(currentScreenTextNode);
 }
 
 let isFirstToggle = true;
