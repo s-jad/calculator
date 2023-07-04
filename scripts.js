@@ -79,6 +79,14 @@ radDegBtn.innerText = "Rad";
 
 const buttons = document.getElementsByClassName('btn');
 
+const superScript = document.createElement("sup");
+superScript.classList.add("superscript");
+
+const protoTextNode = document.createElement("span");
+
+let currentScreenTextNode = protoTextNode;
+screenCurrentEq.appendChild(currentScreenTextNode);
+
 // GLOBAL VARIABLES
 let currentEq = [];
 let prevAns = 0;
@@ -87,6 +95,8 @@ let infoModalOpen = false;
 let postOperatorSpace = false;
 let postNumberSpace = false;
 let isRad = true;
+let superscript = false;
+
 
 // FUNCTIONS 
 function handleButtons(button) {
@@ -96,20 +106,29 @@ function handleButtons(button) {
             if (match) {
                 let btnNumber = parseInt(match[0], 10);
                 currentEq.push(btnNumber);
-                if (postOperatorSpace === true) {
-                    screenCurrentEq.innerText += (" " + match[0]);
-                    postOperatorSpace = false;
+                if (superscript) {
+                    if (postOperatorSpace === true) {
+                        currentScreenTextNode.innerText += (" " + match[0]);
+                        postOperatorSpace = false;
+                    } else {
+                        currentScreenTextNode.innerText += match[0];
+                    }
                 } else {
-                    screenCurrentEq.innerText += match[0];
+                    if (postOperatorSpace === true) {
+                        currentScreenTextNode.innerText += (" " + match[0]);
+                        postOperatorSpace = false;
+                    } else {
+                        currentScreenTextNode.innerText += match[0];
+                    }
                 }
             }
             if (button.id === "dot-btn") {
-                currentEq.push(".");
                 updateDisplayString(".");
+                currentEq.push(".");
             }
             if (button.id === "result-btn") {
-                currentEq.push(prevAns);
                 updateDisplayString(" Ans ");
+                currentEq.push(prevAns);
             }
             break;
 
@@ -134,112 +153,200 @@ function handleButtons(button) {
 }
 
 function updateDisplayString(str) {
-    screenCurrentEq.innerText = screenCurrentEq.innerText + `${str}`;
+    currentScreenTextNode.innerText = currentScreenTextNode.innerText + `${str}`;
 }
 
 function updateDisplayOperator(nextOperator) {
     switch (true) {
         case nextOperator.id === "plus-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " + ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " + ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " + ";
+            }
             currentEq.push("+");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "minus-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " - ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " - ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " - ";
+            }
             currentEq.push("-");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "multiply-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " * ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " * ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " * ";
+            }
             currentEq.push("*");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "divide-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " / ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " / ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " / ";
+            }
             currentEq.push("/");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "equals-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " = ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " = ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " = ";
+            }
             currentEq.push("=");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "factorial-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + "! ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "! ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "! ";
+            }
             currentEq.push("!");
             postOperatorSpace = true;
             break;
 
         case nextOperator.id === "power-btn":
             currentEq.push("^");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + "^";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ^ ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + "^";
+            }
             break;
 
         case nextOperator.id === "sqrt-btn":
             currentEq.push("√");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " √";
+            currentEq.push("(");
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
+            }
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " √(";
             break;
 
         case nextOperator.id === "l-bracket-btn":
             currentEq.push("(");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " ( ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ( ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ( ";
+            }
             break;
 
         case nextOperator.id === "r-bracket-btn":
             currentEq.push(")");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " ) ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " )";
+                let newTextNode = document.createElement("span");
+                newTextNode.innerText = " ";
+                currentScreenTextNode = newTextNode;
+                screenCurrentEq.appendChild(currentScreenTextNode);
+                superscript = false;
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ) ";
+            }
             break;
 
         case nextOperator.id === "log-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " log";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " log(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " log(";
+            }
             currentEq.push("log");
+            currentEq.push("(");
             break;
 
         case nextOperator.id === "ln-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " ln";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ln(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " ln(";
+            }
             currentEq.push("ln");
+            currentEq.push("(");
             break;
 
         case nextOperator.id === "sin-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " sin";
-            currentEq.push("*");
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " sin(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " sin(";
+            }
+            currentEq.push("sin");
+            currentEq.push("(");
             break;
 
         case nextOperator.id === "cos-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " cos";
-            currentEq.push("/");
-            postOperatorSpace = true;
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " cos(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " cos(";
+            }
+            currentEq.push("cos");
+            currentEq.push("(");
             break;
 
         case nextOperator.id === "tan-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " tan";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " tan(";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " tan(";
+            }
             currentEq.push("tan");
-            postOperatorSpace = true;
+            currentEq.push("(");
             break;
 
         case nextOperator.id === "pi-btn":
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " π ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " π ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " π ";
+            }
             currentEq.push("π");
+            postOperatorSpace = true;
             break;
 
         case nextOperator.id === "e-btn":
             currentEq.push("e");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " e ";
+            currentEq.push("(");
+            currentScreenTextNode.innerText = currentScreenTextNode.innerText + " e";
+            screenCurrentEq.appendChild(superScript);
+            currentScreenTextNode = superScript;
+            currentScreenTextNode.innerText = "(";
+            superscript = true;
             break;
 
         case nextOperator.id === "mod-btn":
             currentEq.push("%");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " % ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " % ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " % ";
+            }
             break;
 
         case nextOperator.id === "inv-btn":
             currentEq.push("Inv");
-            screenCurrentEq.innerText = screenCurrentEq.innerText + " Inv ";
+            if (superscript) {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " Inv ";
+            } else {
+                currentScreenTextNode.innerText = currentScreenTextNode.innerText + " Inv ";
+            }
             break;
 
         case nextOperator.id === "rad-deg-btn":
@@ -640,7 +747,12 @@ function displayPrevAns(prevAns) {
 
 function deleteCurrentEq() {
     currentEq = [];
-    screenCurrentEq.innerText = "";
+    // Remove all of the spans and sups
+    while (screenCurrentEq.firstChild) {
+        screenCurrentEq.remove(screenCurrentEq.firstChild);
+    }
+
+    currentScreenTextNode.innerText = "";
 }
 
 let isFirstToggle = true;
