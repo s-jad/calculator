@@ -621,44 +621,44 @@ function handleSinCosTan({ variables, operators }) {
         if (variables.length === 2) {
             console.log("Last operation!!!");
             if (operators[i] == "sin") {
-                result = Math.sin(variables[0]);
-                console.log(`calculating: sin(${variables[0]})`);
+                result = Math.sin(variables[1]);
+                console.log(`calculating: sin(${variables[1]})`);
                 break;
             }
 
             if (operators[i] == "cos") {
-                result = Math.cos(variables[0]);
-                console.log(`calculating: cos(${variables[0]})`);
+                result = Math.cos(variables[1]);
+                console.log(`calculating: cos(${variables[1]})`);
                 break;
             }
 
             if (operators[i] == "tan") {
-                result = Math.tan(variables[0]);
-                console.log(`calculating: tan(${variables[0]})`);
+                result = Math.tan(variables[1]);
+                console.log(`calculating: tan(${variables[1]})`);
                 break;
             }
         }
 
         if (operators[i] === "sin") {
-            result = parseFloat(Math.sin(variables[i - stepBackB]));
-            console.log(`calculating: sin(${variables[i - stepBackB]}) = ${result}`);
-            variables.splice(i - stepBackB, 1, result);
+            result = parseFloat(Math.sin(variables[i + 1 - stepBackB]));
+            console.log(`calculating: sin(${variables[i + 1 - stepBackB]}) = ${result}`);
+            variables.splice(i + 1 - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
 
         if (operators[i] === "cos") {
-            result = parseFloat(Math.cos(variables[i - stepBackB]));
-            console.log(`calculating: cos(${variables[i - stepBackB]}) = ${result}`);
-            variables.splice(i - stepBackB, 1, result);
+            result = parseFloat(Math.cos(variables[i + 1 - stepBackB]));
+            console.log(`calculating: cos(${variables[i + 1 - stepBackB]}) = ${result}`);
+            variables.splice(i + 1 - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
 
         if (operators[i] === "tan") {
-            result = parseFloat(Math.tan(variables[i - stepBackB]));
-            console.log(`calculating: tan(${variables[i - stepBackB]}) = ${result}`);
-            variables.splice(i - stepBackB, 1, result);
+            result = parseFloat(Math.tan(variables[i + 1 - stepBackB]));
+            console.log(`calculating: tan(${variables[i + 1 - stepBackB]}) = ${result}`);
+            variables.splice(i + 1 - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
@@ -714,7 +714,7 @@ function collectVarOps(eqStr) {
         if (operators[i] === "s" ||
             operators[i] === "c" ||
             operators[i] === "t") {
-            operators = [operators.slice(i, i + 3).join(''), ...operators.slice(i + 3, operators.length)]
+            operators = [operators.slice(0, i), operators.slice(i, i + 3).join(''), ...operators.slice(i + 3, operators.length)]
         }
     }
     console.log(`COLLECT_VAR_OPS: operators => ${operators}`);
