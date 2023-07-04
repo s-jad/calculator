@@ -381,7 +381,8 @@ function handleEquals() {
         // If this is NOT the innermost sub-equation
         // Will never be true in the first loop
         if (nodes[i].includes("?")) {
-
+            // Check for nodes that have numbers
+            // or e, sin, cos, tan, log, ln before the brackets 
             nodes = handlePrePostBrackets(i, nodes);
             // Replace ? with total from within bracketed equation
             nodes[i] = nodes[i].replace("?", total);
@@ -414,6 +415,39 @@ function handlePrePostBrackets(nodeIndex, nodes) {
         console.log("only index - 1 is a number!");
         nodes[nodeIndex] = nodes[nodeIndex].substring(0, index) + "*?" + nodes[nodeIndex].substring(index - 1 + "*?".length);
         console.log(`nodes[i] => ${nodes[nodeIndex]}`);
+    }
+
+    if (nodes[nodeIndex][index - 3] === "s" &&
+        nodes[nodeIndex][index - 2] === "i" &&
+        nodes[nodeIndex][index - 1] === "n") {
+        console.log(`Found "sin" start: ${index - 3} end: ${index - 1}`);
+    }
+
+    if (nodes[nodeIndex][index - 3] === "c" &&
+        nodes[nodeIndex][index - 2] === "o" &&
+        nodes[nodeIndex][index - 1] === "s") {
+        console.log(`Found "cos" start: ${index - 3} end: ${index - 1}`);
+    }
+
+    if (nodes[nodeIndex][index - 3] === "t" &&
+        nodes[nodeIndex][index - 2] === "a" &&
+        nodes[nodeIndex][index - 1] === "n") {
+        console.log(`Found "tan" start: ${index - 3} end: ${index - 1}`);
+    }
+
+    if (nodes[nodeIndex][index - 3] === "l" &&
+        nodes[nodeIndex][index - 2] === "o" &&
+        nodes[nodeIndex][index - 1] === "g") {
+        console.log(`Found "log" start: ${index - 3} end: ${index - 1}`);
+    }
+
+    if (nodes[nodeIndex][index - 2] === "l" &&
+        nodes[nodeIndex][index - 1] === "n") {
+        console.log(`Found "ln" start: ${index - 2} end: ${index - 1}`);
+    }
+
+    if (nodes[nodeIndex][index - 1] === "π") {
+        console.log(`Found "π" at index: ${index - 1}`);
     }
 
     return nodes;
@@ -579,8 +613,74 @@ function handleAddSubtract(variables, operators) {
     return { result, operators };
 }
 
+function handleSinCosTan({ variables, operators }) {
+    let result = 0;
+    let stepBackB = 0;
+
+    for (let i = 0; i < operators.length; i++) {
+        if (variables.length === 2) {
+            console.log("Last operation!!!");
+            if (operators[i] == "sin") {
+                result = Math.sin(variables[0]);
+                console.log(`calculating: sin(${variables[0]})`);
+                break;
+            }
+
+            if (operators[i] == "cos") {
+                result = Math.cos(variables[0]);
+                console.log(`calculating: cos(${variables[0]})`);
+                break;
+            }
+
+            if (operators[i] == "tan") {
+                result = Math.tan(variables[0]);
+                console.log(`calculating: tan(${variables[0]})`);
+                break;
+            }
+        }
+
+        if (operators[i] === "sin") {
+            result = parseFloat(Math.sin(variables[i - stepBackB]));
+            console.log(`calculating: sin(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
+            stepBackB++;
+            console.log(`variable array: ${variables}`);
+        }
+
+        if (operators[i] === "cos") {
+            result = parseFloat(Math.cos(variables[i - stepBackB]));
+            console.log(`calculating: cos(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
+            stepBackB++;
+            console.log(`variable array: ${variables}`);
+        }
+
+        if (operators[i] === "tan") {
+            result = parseFloat(Math.tan(variables[i - stepBackB]));
+            console.log(`calculating: tan(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
+            stepBackB++;
+            console.log(`variable array: ${variables}`);
+        }
+
+    }
+    // Clear the used operators
+    operators = operators.filter(function(operator) {
+        return operator !== "sin" && operator !== "cos" && operator !== "tan";
+    });
+
+    return { result, operators };
+}
+
 function parseEquation({ variables, operators }) {
     let data = { result: 0, operators: operators };
+
+    if (operators.includes("sin") || operators.includes("cos") || operators.includes("tan")) {
+        console.log(`PARSE_EQ preSCT: variables, operators => [${variables}], [${operators}]`);
+        data = handleSinCosTan({ variables, operators });
+        console.log(`PARSE_EQ postSCT: variables, operators => [${variables}], [${data.operators}]`);
+        console.log(`SCT PARSE_EQ: result => ${data.result}`);
+    }
 
     if (operators.includes("!") || operators.includes("^") || operators.includes("√")) {
         console.log(`PARSE_EQ preFE: variables, operators => [${variables}], [${operators}]`);
@@ -607,8 +707,17 @@ function collectVarOps(eqStr) {
     // Matches 123456890 and . for floats
     let variables = eqStr.match(/\d+(\.\d+)?/g);
     // Matches +-*/!^ - all current operators
-    let operators = eqStr.match(/[+\-*/!^√]/g);
+    let operators = eqStr.match(/[+\-*/!^√sincostan]/g);
 
+    // Rejoin the sin cos and tan operators
+    for (let i = 0; i < operators.length; i++) {
+        if (operators[i] === "s" ||
+            operators[i] === "c" ||
+            operators[i] === "t") {
+            operators = [operators.slice(i, i + 3).join(''), ...operators.slice(i + 3, operators.length)]
+        }
+    }
+    console.log(`COLLECT_VAR_OPS: operators => ${operators}`);
     return { variables, operators };
 }
 
