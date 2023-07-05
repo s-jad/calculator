@@ -106,20 +106,11 @@ function handleButtons(button) {
             if (match) {
                 let btnNumber = parseInt(match[0], 10);
                 currentEq.push(btnNumber);
-                if (superscript) {
-                    if (postOperatorSpace === true) {
-                        currentScreenTextNode.innerText += (" " + match[0]);
-                        postOperatorSpace = false;
-                    } else {
-                        currentScreenTextNode.innerText += match[0];
-                    }
+                if (postOperatorSpace === true) {
+                    currentScreenTextNode.innerText += (" " + match[0]);
+                    postOperatorSpace = false;
                 } else {
-                    if (postOperatorSpace === true) {
-                        currentScreenTextNode.innerText += (" " + match[0]);
-                        postOperatorSpace = false;
-                    } else {
-                        currentScreenTextNode.innerText += match[0];
-                    }
+                    currentScreenTextNode.innerText += match[0];
                 }
             }
             if (button.id === "dot-btn") {
@@ -639,13 +630,21 @@ function collectVarOps(eqStr) {
     let variables = eqStr.match(/\d+(\.\d+)?/g);
     // Matches +-*/!^ - all current operators
     let operators = eqStr.match(/[+\-*/!^√sincostan]/g);
+    console.log(`COLLECT_VAR_OPS: operators (pre-rejoin) => ${operators}`);
 
-    // Rejoin the sin cos and tan operators
+    // If no operators in node, return early
+    if (operators === null) {
+        return { variables, operators };
+    }
+
+    // ... Otherwise rejoin the sin cos and tan operators
     for (let i = 0; i < operators.length; i++) {
         if (operators[i] === "s" ||
             operators[i] === "c" ||
             operators[i] === "t") {
-            operators = [operators.slice(0, i), operators.slice(i, i + 3).join(''), ...operators.slice(i + 3, operators.length)]
+            operators = [operators.slice(0, i),
+            operators.slice(i, i + 3).join(''),
+            ...operators.slice(i + 3, operators.length)]
         }
     }
     console.log(`COLLECT_VAR_OPS: operators => ${operators}`);
@@ -864,6 +863,83 @@ function openInfoModal() {
     }
 }
 
+function handleKeys(key) {
+    switch (key) {
+        case "Digit1":
+            currentEq.push(1);
+            currentScreenTextNode.innerText += "1";
+            break;
+
+        case "Digit2":
+            currentEq.push(2);
+            currentScreenTextNode.innerText += "2";
+            break;
+
+        case "Digit3":
+            currentEq.push(3);
+            currentScreenTextNode.innerText += "3";
+            break;
+
+        case "Digit4":
+            currentEq.push(4);
+            currentScreenTextNode.innerText += "4";
+            break;
+
+        case "Digit5":
+            currentEq.push(5);
+            currentScreenTextNode.innerText += "5";
+            break;
+
+        case "Digit6":
+            currentEq.push(6);
+            currentScreenTextNode.innerText += "6";
+            break;
+
+        case "Digit7":
+            currentEq.push(7);
+            currentScreenTextNode.innerText += "7";
+            break;
+
+        case "Digit8":
+            currentEq.push(8);
+            currentScreenTextNode.innerText += "8";
+            break;
+
+        case "Digit9":
+            currentEq.push(9);
+            currentScreenTextNode.innerText += "9";
+            break;
+
+        case "Digit0":
+            currentEq.push(0);
+            currentScreenTextNode.innerText += "0";
+            break;
+
+        case "NumpadAdd":
+            currentEq.push("+");
+            currentScreenTextNode.innerText += " + ";
+            break;
+
+        case "NumpadSubtract":
+            currentEq.push("-");
+            currentScreenTextNode.innerText += " - ";
+            break;
+
+        case "NumpadMultiply":
+            currentEq.push("*");
+            currentScreenTextNode.innerText += " * ";
+            break;
+
+        case "NumpadDivide":
+            currentEq.push("/");
+            currentScreenTextNode.innerText += " / ";
+            break;
+
+        default:
+            break;
+    }
+}
+
 // EVENT LISTENERS
 
 // -- MOUSE EVENT LISTENERS
@@ -874,6 +950,14 @@ Array.from(buttons).forEach((button) => {
 
 
 // -- KEYBOARD EVENT LISTENERS
+document.addEventListener('keydown', (e) => {
+    e.preventDefault();
+    handleKeys(e.code)
+});
+
+
 
 // UTILITY FUNCTIONS
 
+// To log keyCodes
+// document.addEventListener('keydown', (e) => console.log(e.code));
