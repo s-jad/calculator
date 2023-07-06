@@ -381,6 +381,7 @@ function calculate(nodeStr) {
 
     // Check for single num in brackets: 3*(54) 
     if (operators === null) {
+        console.log(`Appears to be no operators left!`);
         return parseFloat(variables[0]);
     }
 
@@ -389,7 +390,7 @@ function calculate(nodeStr) {
     return parseFloat(result);
 }
 
-function handleFactorialExponentialSqrt({ variables, operators }) {
+function handleFactorialExponentialSqrt(variables, operators) {
     let result = 0;
     let stepBackA = 0;
 
@@ -540,53 +541,54 @@ function handleSinCosTan({ variables, operators }) {
     let stepBackB = 0;
 
     for (let i = 0; i < operators.length; i++) {
-        if (variables.length === 2) {
+        if (variables.length === 1) {
             console.log("Last operation!!!");
             if (operators[i] == "sin") {
-                result = Math.sin(variables[1]);
-                console.log(`calculating: sin(${variables[1]})`);
+                result = Math.sin(variables[0]);
+                console.log(`calculating: sin(${variables[0]})`);
                 break;
             }
 
             if (operators[i] == "cos") {
-                result = Math.cos(variables[1]);
-                console.log(`calculating: cos(${variables[1]})`);
+                result = Math.cos(variables[0]);
+                console.log(`calculating: cos(${variables[0]})`);
                 break;
             }
 
             if (operators[i] == "tan") {
-                result = Math.tan(variables[1]);
-                console.log(`calculating: tan(${variables[1]})`);
+                result = Math.tan(variables[0]);
+                console.log(`calculating: tan(${variables[0]})`);
                 break;
             }
         }
 
         if (operators[i] === "sin") {
-            result = parseFloat(Math.sin(variables[i + 1 - stepBackB]));
-            console.log(`calculating: sin(${variables[i + 1 - stepBackB]}) = ${result}`);
-            variables.splice(i + 1 - stepBackB, 1, result);
+            result = parseFloat(Math.sin(variables[i - stepBackB]));
+            console.log(`calculating: sin(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
 
         if (operators[i] === "cos") {
-            result = parseFloat(Math.cos(variables[i + 1 - stepBackB]));
-            console.log(`calculating: cos(${variables[i + 1 - stepBackB]}) = ${result}`);
-            variables.splice(i + 1 - stepBackB, 1, result);
+            result = parseFloat(Math.cos(variables[i - stepBackB]));
+            console.log(`calculating: cos(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
 
         if (operators[i] === "tan") {
-            result = parseFloat(Math.tan(variables[i + 1 - stepBackB]));
-            console.log(`calculating: tan(${variables[i + 1 - stepBackB]}) = ${result}`);
-            variables.splice(i + 1 - stepBackB, 1, result);
+            result = parseFloat(Math.tan(variables[i - stepBackB]));
+            console.log(`calculating: tan(${variables[i - stepBackB]}) = ${result}`);
+            variables.splice(i - stepBackB, 1, result);
             stepBackB++;
             console.log(`variable array: ${variables}`);
         }
 
     }
-    // Clear the used operators
+
+    //Clear the used operators
     operators = operators.filter(function(operator) {
         return operator !== "sin" && operator !== "cos" && operator !== "tan";
     });
@@ -605,23 +607,29 @@ function parseEquation({ variables, operators }) {
     }
 
     if (operators.includes("!") || operators.includes("^") || operators.includes("√")) {
-        console.log(`PARSE_EQ preFE: variables, operators => [${variables}], [${operators}]`);
-        data = handleFactorialExponentialSqrt({ variables, operators });
+        console.log(`PARSE_EQ preFE: variables, operators => [${variables}], [${data.operators}]`);
+        data = handleFactorialExponentialSqrt(variables, data.operators);
         console.log(`PARSE_EQ postFE: variables, operators => [${variables}], [${data.operators}]`);
         console.log(`FE PARSE_EQ: result => ${data.result}`);
     }
+
+    console.log(`operators, pre- */ if => ${operators} `)
+    console.log(`operators includes "*" ? => ${operators.includes("*")}`);
+
     if (operators.includes("*") || operators.includes("/")) {
         console.log(`PARSE_EQ preMD: variables, operators => [${variables}], [${data.operators}]`);
         data = handleMultiplyDivide(variables, data.operators);
         console.log(`PARSE_EQ postMD: variables, operators => [${variables}], [${data.operators}]`);
         console.log(`MD PARSE_EQ: result => ${data.result}`);
     }
+
     if (operators.includes("+") || operators.includes("-")) {
         console.log(`PARSE_EQ preAS: variables, operators => [${variables}], [${data.operators}]`);
         data = handleAddSubtract(variables, data.operators);
         console.log(`PARSE_EQ postAS: variables, operators => [${variables}], [${data.operators}]`);
         console.log(`AS PARSE_EQ: result => ${data.result}`);
     }
+
     return data.result;
 }
 
@@ -638,16 +646,26 @@ function collectVarOps(eqStr) {
     }
 
     // ... Otherwise rejoin the sin cos and tan operators
+
     for (let i = 0; i < operators.length; i++) {
         if (operators[i] === "s" ||
             operators[i] === "c" ||
             operators[i] === "t") {
-            operators = [operators.slice(0, i),
-            operators.slice(i, i + 3).join(''),
-            ...operators.slice(i + 3, operators.length)]
+            operators[i] = operators.slice(i, i + 3).join('');
         }
     }
-    console.log(`COLLECT_VAR_OPS: operators => ${operators}`);
+
+    operators = operators.filter(function(operator) {
+        console.log(`filtering leftover letters!!!`);
+        return operator !== "i" &&
+            operator !== "n" &&
+            operator !== "o" &&
+            operator !== "s" &&
+            operator !== "a" &&
+            operator !== "l" &&
+            operator !== "g";
+    })
+    console.log(`COLLECT_VAR_OPS: post-filtering operators => ${operators}`);
     return { variables, operators };
 }
 
@@ -918,21 +936,25 @@ function handleKeys(key) {
         case "NumpadAdd":
             currentEq.push("+");
             currentScreenTextNode.innerText += " + ";
+            postOperatorSpace = true;
             break;
 
         case "NumpadSubtract":
             currentEq.push("-");
             currentScreenTextNode.innerText += " - ";
+            postOperatorSpace = true;
             break;
 
         case "NumpadMultiply":
             currentEq.push("*");
             currentScreenTextNode.innerText += " * ";
+            postOperatorSpace = true;
             break;
 
         case "NumpadDivide":
             currentEq.push("/");
             currentScreenTextNode.innerText += " / ";
+            postOperatorSpace = true;
             break;
 
         default:
